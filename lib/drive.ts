@@ -1,4 +1,4 @@
-// Client-side & Server-side Google Drive User-Owned Storage Manager (Kuriocity 2.0 LGPD)
+// Client-side & Server-side Google Drive User-Owned Storage Manager (Kurió City Tour LGPD)
 
 export interface DriveUploadResult {
   fileId: string
@@ -7,21 +7,21 @@ export interface DriveUploadResult {
 }
 
 /**
- * Cria a pasta "Kuriocity - Meus Comprovantes" no Google Drive do usuário logado
+ * Cria a pasta "Kurió City Tour - Meus Comprovantes" no Google Drive do usuário logado
  * e envia o comprovante/foto diretamente para a nuvem do próprio cidadão.
  */
 export async function uploadParaGoogleDriveUsuario(
   accessToken: string,
   file: File,
-  descricao = 'Comprovante Kuriocity'
+  descricao = 'Comprovante Kurió City Tour'
 ): Promise<DriveUploadResult> {
   try {
-    // 1. Verificar ou Criar a Pasta "Kuriocity - Meus Comprovantes"
+    // 1. Verificar ou Criar a Pasta "Kurió City Tour - Meus Comprovantes"
     const folderId = await obterOuCriarPastaKuriocity(accessToken)
 
     // 2. Upload do Arquivo para dentro da Pasta
     const metadata = {
-      name: `Kuriocity_${Date.now()}_${file.name}`,
+      name: `Kurio_${Date.now()}_${file.name}`,
       mimeType: file.type,
       parents: [folderId],
       description: descricao,
@@ -76,13 +76,13 @@ export async function uploadParaGoogleDriveUsuario(
     return {
       fileId: mockId,
       driveViewUrl: `https://drive.google.com/file/d/${mockId}/view?usp=sharing`,
-      folderUrl: `https://drive.google.com/drive/folders/kuriocity-comprovantes`,
+      folderUrl: `https://drive.google.com/drive/folders/kurio-city-tour-comprovantes`,
     }
   }
 }
 
 async function obterOuCriarPastaKuriocity(accessToken: string): Promise<string> {
-  const pastaNome = 'Kuriocity - Meus Comprovantes'
+  const pastaNome = 'Kurió City Tour - Meus Comprovantes'
   
   // Buscar pasta existente
   const searchRes = await fetch(

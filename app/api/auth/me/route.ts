@@ -3,7 +3,7 @@ import { User, UserRole } from '@/lib/types'
 
 let mockUser: User = {
   id: 'user-demo-1',
-  email: 'cidadao@kuriocity.org.br',
+  email: 'cidadao@kuriocitytour.org.br',
   nome: 'Lucas Silva',
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   role: 'CIDADAO',

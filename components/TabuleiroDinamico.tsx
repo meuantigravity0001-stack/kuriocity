@@ -48,7 +48,7 @@ export default function TabuleiroDinamico({
 
       // Tile layer 100% gratuito e oficial do OpenStreetMap (sem necessidade de API Key)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> | Kuriocity',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> | Kurió City Tour',
         maxZoom: 19,
         subdomains: ['a', 'b', 'c'],
       }).addTo(map)

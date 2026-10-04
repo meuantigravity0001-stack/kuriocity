@@ -28,7 +28,7 @@ export function gerarDossieIPTU(ponto: PontoDeCuidado): DossieIPTUReport {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>DOSSIÊ CÍVICO DE ZELADORIA PARTICIPATIVA - KURIOCITY</title>
+  <title>DOSSIÊ CÍVICO DE ZELADORIA PARTICIPATIVA - KURIÓ CITY TOUR</title>
   <style>
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 40px; }
     .header { border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -54,7 +54,7 @@ export function gerarDossieIPTU(ponto: PontoDeCuidado): DossieIPTUReport {
     <div>
       <div class="title">🏛️ DOSSIÊ CÍVICO DE ZELADORIA PARTICIPATIVA</div>
       <div class="subtitle">Requerimento de Crédito Educativo e Abatimento Progressivo do IPTU</div>
-      <div class="subtitle">Plataforma Kuriocity — Zeladoria Colaborativa & Conexão de Vizinhança</div>
+      <div class="subtitle">Plataforma Kurió City Tour — Zeladoria Colaborativa & Conexão de Vizinhança</div>
     </div>
     <div class="protocolo">
       Nº: ${protocoloNumero}<br>
@@ -142,7 +142,7 @@ export function gerarDossieIPTU(ponto: PontoDeCuidado): DossieIPTUReport {
   </div>
 
   <div class="footer">
-    Kuriocity — Zeladoria Colaborativa e Conexão de Vizinhança | Protocolo Autêntico com Assinatura Digital Hash: <code>${ponto.id}</code>
+    Kurió City Tour — Zeladoria Colaborativa e Conexão de Vizinhança | Protocolo Autêntico com Assinatura Digital Hash: <code>${ponto.id}</code>
   </div>
 </body>
 </html>`

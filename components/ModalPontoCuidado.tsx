@@ -332,7 +332,7 @@ export default function ModalPontoCuidado({ onClose, onSuccess }: ModalPontoCuid
                     <div className="text-center p-4">
                       <FolderLock size={26} className="text-blue-400 mx-auto mb-2" />
                       <p className="text-gray-300 text-xs font-bold">Toque para adicionar evidência</p>
-                      <p className="text-gray-600 text-[10px] mt-1">Salva na sua pasta "Kuriocity" no Google Drive</p>
+                      <p className="text-gray-600 text-[10px] mt-1">Salva na sua pasta "Kurió City Tour" no Google Drive</p>
                     </div>
                   )}
                 </label>
@@ -561,7 +561,7 @@ export default function ModalPontoCuidado({ onClose, onSuccess }: ModalPontoCuid
                       <UserPlus size={13} /> Ponto publicado como "Aberto a Candidaturas"
                     </p>
                     <p className="text-gray-400 text-[11px] leading-relaxed">
-                      Prestadores de serviço cadastrados no Kuriocity poderão se candidatar a executar esta obra. A comunidade aprova o candidato antes do Pix ser liberado.
+                      Prestadores de serviço cadastrados no Kurió City Tour poderão se candidatar a executar esta obra. A comunidade aprova o candidato antes do Pix ser liberado.
                     </p>
                     <div className="mt-2">
                       <input

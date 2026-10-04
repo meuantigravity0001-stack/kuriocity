@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google'
 import { User, getRoleBadge } from '@/lib/types'
 import { getCurrentUser, logoutUser } from '@/lib/auth'
 import ModalAuthOnboarding from '@/components/ModalAuthOnboarding'
+import KurioLogo from '@/components/KurioLogo'
 import {
   MapPin,
   Menu,
@@ -66,11 +67,8 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200/80">
         <div className={`${CONTAINER_INNER} h-16 flex items-center justify-between`}>
 
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-base font-bold shadow-sm group-hover:scale-105 transition-transform">
-              🌱
-            </div>
-            <span className="font-black text-base text-slate-900 tracking-tight">Kuriocity</span>
+          <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
+            <KurioLogo className="h-9" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6">
@@ -503,13 +501,9 @@ export default function LandingPage() {
       {/* ─────────── FOOTER ─────────── */}
       <footer className="py-10 bg-white border-t border-slate-200/80 mt-12">
         <div className={`${CONTAINER_INNER} flex flex-col sm:flex-row items-center justify-between gap-5`}>
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-base">🌱</div>
-            <div>
-              <p className="font-black text-sm text-slate-900">Kuriocity</p>
-              <p className="text-xs text-slate-500">Zeladoria Cívica Colaborativa P2P · 2026</p>
-            </div>
-          </div>
+          <Link href="/" className="hover:opacity-90 transition-opacity">
+            <KurioLogo className="h-9" />
+          </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-600 font-semibold">
             <Link href="/" className="hover:text-slate-900 transition-colors">Mapa do Bairro</Link>

@@ -1,10 +1,10 @@
 import { User, UserRole } from './types'
 
-const MOCK_USER_STORAGE_KEY = 'kuriocity_user_session'
+const MOCK_USER_STORAGE_KEY = 'kurio_city_tour_session'
 
 export const DEFAULT_USER: User = {
   id: 'user-demo-1',
-  email: 'cidadao@kuriocity.org.br',
+  email: 'cidadao@kuriocitytour.org.br',
   nome: 'Lucas Silva',
   telefone: '(11) 98765-4321',
   endereco: 'Rua das Flores, 120 - Bairro Central',

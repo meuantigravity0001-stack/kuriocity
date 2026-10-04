@@ -10,6 +10,7 @@ import ModalContribuicaoPix from '@/components/ModalContribuicaoPix'
 import ModalProofOfWork from '@/components/ModalProofOfWork'
 import ModalDossieIPTU from '@/components/ModalDossieIPTU'
 import ModalAuthOnboarding from '@/components/ModalAuthOnboarding'
+import KurioLogo from '@/components/KurioLogo'
 import {
   PlusCircle,
   RefreshCw,
@@ -115,22 +116,9 @@ export default function HomePage() {
         className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-3.5 shadow-md backdrop-blur-xl bg-white/95 border-b border-slate-200/80"
       >
         {/* Logo & Tagline */}
-        <div className="flex items-center gap-3">
-          <Link href="/home" className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0 bg-blue-600 text-white shadow-md shadow-blue-500/20 hover:scale-105 transition-transform">
-            🌱
-          </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-slate-900 font-bold text-base tracking-tight">Kuriocity</h1>
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                v2.1 Roles
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">
-              Zeladoria Colaborativa & Conexão Local
-            </p>
-          </div>
-        </div>
+        <Link href="/home" className="hover:opacity-90 transition-opacity">
+          <KurioLogo className="h-9" />
+        </Link>
 
         {/* User Profile Badge & Role Selector */}
         <div className="flex items-center gap-2.5">
@@ -462,7 +450,7 @@ function DetalheDrawer({
       >
         <div className="pr-4 min-w-0">
           <p className="text-sm font-bold text-slate-900 truncate">Detalhes da Zeladoria</p>
-          <p className="text-xs text-slate-500 font-medium">Kuriocity — Conexão de Vizinhança</p>
+          <p className="text-xs text-slate-500 font-medium">Kurió City Tour — Conexão de Vizinhança</p>
         </div>
         <button
           onClick={onClose}

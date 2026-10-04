@@ -1,4 +1,4 @@
-# 🌆 KURIOCITY — Zeladoria Cidadã & Tabuleiro Cívico
+# 🌆 KURIÓ CITY TOUR — Zeladoria Cidadã & Tabuleiro Cívico
 
 > **Transforme problemas urbanos em missões cívicas.** O mapa da sua cidade vira um tabuleiro tático de zeladoria onde cada cidadão é um agente de mudança.
 
@@ -6,7 +6,7 @@
 
 ## 🎮 Conceito
 
-Inspirado em dinamismo urbano, o **KURIOCITY** transforma o engajamento cívico em uma experiência tática:
+Inspirado no canto, agilidade e livre circulação urbana, o **Kurió City Tour** transforma o engajamento cívico em uma experiência tática:
 
 | Elemento | Equivalente no App |
 |---|---|

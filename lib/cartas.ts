@@ -1,4 +1,4 @@
-// Cartas de Zeladoria Colaborativa & Parceiros do Bairro — Kuriocity 2.0
+// Cartas de Zeladoria Colaborativa & Parceiros do Bairro — Kurió City Tour
 export interface CartaParceiro {
   id: string
   categoria: string

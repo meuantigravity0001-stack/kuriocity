@@ -5,14 +5,14 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'Kuriocity — Zeladoria Colaborativa & Conexão Local',
+  title: 'Kurió City Tour — Zeladoria Colaborativa & Conexão Local',
   description:
-    'Plataforma cívica P2P onde pedestres, comerciantes e prestadores de serviço se unem para resolver microproblemas urbanos com Pix direto, Google Drive e Dossiê de IPTU.',
-  keywords: ['zeladoria urbana', 'cidadania', 'pix p2p', 'kuriocity', 'mapa cívico', 'IPTU', 'comércio local'],
-  authors: [{ name: 'Kuriocity' }],
+    'Kurió City Tour — Zeladoria colaborativa e exploração urbana conectada.',
+  keywords: ['kurió city tour', 'kurio', 'zeladoria urbana', 'cidadania', 'pix p2p', 'mapa cívico', 'IPTU', 'comércio local'],
+  authors: [{ name: 'Kurió City Tour' }],
   openGraph: {
-    title: 'Kuriocity — Zeladoria Colaborativa & Conexão Local',
-    description: 'Melhore o seu bairro, fortaleça o comércio local e receba incentivos fiscais.',
+    title: 'Kurió City Tour — Zeladoria Colaborativa & Conexão Local',
+    description: 'Kurió City Tour — Zeladoria colaborativa e exploração urbana conectada.',
     type: 'website',
   },
 }

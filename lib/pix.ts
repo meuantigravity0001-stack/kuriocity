@@ -1,4 +1,4 @@
-// Helper para geração de QR Code Pix P2P Direto & Controle de Reserva Hold (Kuriocity 2.0)
+// Helper para geração de QR Code Pix P2P Direto & Controle de Reserva Hold (Kurió City Tour)
 
 export interface PixPayloadParams {
   chavePix: string
@@ -17,7 +17,7 @@ export function gerarPayloadPixStatico({
   nomeRecebedor,
   cidadeRecebedor,
   valor,
-  txid = 'KURIOCITYP2P',
+  txid = 'KURIOCITYTOUR',
 }: PixPayloadParams): string {
   // Higienizar valores
   const chave = chavePix.trim()

@@ -173,7 +173,7 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
             </div>
             <div>
               <h3 className="text-slate-900 font-extrabold text-base leading-snug">Autenticação & Evolução de Perfil</h3>
-              <p className="text-slate-500 text-xs font-semibold">Kuriocity — Cadastro de Morador & Atuação P2P</p>
+              <p className="text-slate-500 text-xs font-semibold">Kurió City Tour — Cadastro de Morador & Atuação P2P</p>
             </div>
           </div>
           <button
@@ -197,7 +197,7 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
                 <div>
                   <h4 className="text-sm font-black text-blue-900">Passo Obrigatório: Morador / Cidadão</h4>
                   <p className="text-xs text-blue-700 leading-relaxed mt-0.5">
-                    No Kuriocity, todo membro é obrigatoriamente um morador validado. Após confirmar seus dados, você poderá habilitar funções extras de Prestador ou Fornecedor.
+                    No Kurió City Tour, todo membro é obrigatoriamente um morador validado. Após confirmar seus dados, você poderá habilitar funções extras de Prestador ou Fornecedor.
                   </p>
                 </div>
               </div>
