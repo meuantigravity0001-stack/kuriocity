@@ -1,0 +1,146 @@
+// Prisma schema para Rua Legal v2.1 — Zeladoria Colaborativa & Perfis de Usuário (Roles)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CIDADAO
+  COMERCIANTE
+  PRESTADOR
+}
+
+enum StatusPonto {
+  ABERTO
+  EM_ARRECADACAO
+  EM_EXECUCAO
+  CONCLUIDO
+}
+
+enum StatusOrcamento {
+  ARRECADANDO
+  META_ATINGIDA
+  ENTREGUE
+}
+
+enum StatusServico {
+  PENDENTE
+  EM_EXECUCAO
+  AGUARDANDO_APROVACAO
+  APROVADO
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  nome          String
+  avatarUrl     String?
+  role          UserRole  @default(CIDADAO)
+  
+  // Informações do Google OAuth / Drive
+  googleDriveToken String?
+  driveFolderId    String?
+
+  // Dados Específicos para Comerciante
+  nomeLoja      String?
+  cnpj          String?
+  chavePixLoja  String?
+  enderecoLoja  String?
+
+  // Dados Específicos para Prestador de Serviço
+  especialidade     String? // Ex: "Pedreiro / Reformas Gerais"
+  chavePixPrestador String?
+  avaliacaoMedia    Float   @default(5.0)
+  obrasConcluidas   Int     @default(0)
+
+  criadoEm      DateTime  @default(now())
+  atualizadoEm  DateTime  @updatedAt
+}
+
+model PontoDeCuidado {
+  id              String               @id @default(uuid())
+  titulo          String
+  descricao       String
+  latitude        Float
+  longitude       Float
+  endereco        String?
+  cidade          String?
+  status          StatusPonto          @default(ABERTO)
+  driveFolderUrl  String?              // Link da pasta no Google Drive do criador
+  fotoUrl         String?
+  categoria       String               @default("Zeladoria Urbana")
+  criadorNome     String?
+  
+  orcamentoLoja   OrcamentoMaterial?
+  servicoMaoObra  ServicoMaoDeObra?
+  contribuicoes   ContribuicaoPix[]
+  votos           VotoComunitario[]
+  
+  criadoEm        DateTime             @default(now())
+  atualizadoEm    DateTime             @updatedAt
+}
+
+model OrcamentoMaterial {
+  id              String         @id @default(uuid())
+  pontoCuidadoId  String         @unique
+  pontoCuidado    PontoDeCuidado @relation(fields: [pontoCuidadoId], references: [id], onDelete: Cascade)
+  
+  nomeLoja        String
+  chavePixLoja    String         // Chave Pix Direta (CNPJ/E-mail do Lojista)
+  valorTotal      Float
+  valorArrecadado Float          @default(0.0)
+  itensDescricao  String         // Ex: "2x Cimento Todimo, 4x Saco Areia"
+  status          StatusOrcamento @default(ARRECADANDO)
+}
+
+model ServicoMaoDeObra {
+  id                String         @id @default(uuid())
+  pontoCuidadoId    String         @unique
+  pontoCuidado      PontoDeCuidado @relation(fields: [pontoCuidadoId], references: [id], onDelete: Cascade)
+  
+  prestadorNome     String
+  chavePixPrestador String         // Chave Pix Direta do Profissional
+  valorAcordado     Float
+  reputacaoNivel    String         @default("Mestre do Bairro - Nível 1")
+  
+  // Prova de Execução (Proof of Work)
+  checkInData       DateTime?
+  checkInLat        Float?
+  checkInLong       Float?
+  fotoAntesDriveUrl String?        // Link da foto no Drive do prestador
+  fotoDepoisDriveUrl String?       // Link da foto/vídeo no Drive do prestador
+  
+  // Validação da Comunidade
+  status            StatusServico  @default(PENDENTE)
+  votosAprovacao    Int            @default(0)
+  prazoLimitePix    DateTime?      // Data limite para repasses da comunidade (até 30 dias após aprovação)
+}
+
+model ContribuicaoPix {
+  id              String         @id @default(uuid())
+  pontoCuidadoId  String
+  pontoCuidado    PontoDeCuidado @relation(fields: [pontoCuidadoId], references: [id], onDelete: Cascade)
+  
+  colaboradorNome String
+  valor           Float
+  status          String         @default("RESERVADO") // RESERVADO | CONFIRMADO | EXPIRADO
+  chavePixDestino String
+  qrCodePayload   String?
+  expiraEm        DateTime       // Timer de Hold (5 a 10 min)
+  criadoEm        DateTime       @default(now())
+}
+
+model VotoComunitario {
+  id              String         @id @default(uuid())
+  pontoCuidadoId  String
+  pontoCuidado    PontoDeCuidado @relation(fields: [pontoCuidadoId], references: [id], onDelete: Cascade)
+  
+  vizinhoIp       String?
+  aprovado        Boolean
+  criadoEm        DateTime       @default(now())
+}
