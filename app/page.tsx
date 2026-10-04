@@ -113,34 +113,34 @@ export default function HomePage() {
           HUD SUPERIOR — Header com Autenticação e Perfil (Role)
       ══════════════════════════════════════════ */}
       <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 shadow-md backdrop-blur-xl bg-white/95 border-b border-slate-200/80"
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-3 py-2 md:px-6 md:py-3.5 shadow-md backdrop-blur-xl bg-white/95 border-b border-slate-200/80"
       >
         {/* Logo & Tagline */}
         <Link href="/home" className="hover:opacity-90 transition-opacity">
-          <KurioLogo className="h-7 sm:h-9" />
+          <KurioLogo className="h-7 md:h-9" />
         </Link>
 
         {/* User Profile Badge & Role Selector */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 md:gap-2.5">
           {/* Badge Perfil de Atuação */}
           <button
             onClick={() => setModalAuth(true)}
-            className={`flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-semibold shadow-sm transition-all hover:scale-105 ${roleBadge.badgeClass}`}
+            className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-3 md:py-1.5 rounded-xl border text-[11px] md:text-xs font-semibold shadow-sm transition-all hover:scale-105 ${roleBadge.badgeClass}`}
             title="Clique para alterar seu modo de atuação (Cidadão / Loja / Prestador)"
           >
             <span>{roleBadge.emoji}</span>
-            <span className="hidden sm:inline">{roleBadge.label}</span>
+            <span className="hidden md:inline">{roleBadge.label}</span>
           </button>
 
           {/* User Avatar */}
           <button
             onClick={() => setModalAuth(true)}
-            className="flex items-center gap-1 sm:gap-2 p-1 rounded-xl hover:bg-slate-100 transition-all border border-slate-200"
+            className="flex items-center gap-1 md:gap-2 p-1 rounded-xl hover:bg-slate-100 transition-all border border-slate-200"
           >
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.nome} className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover" />
+              <img src={user.avatarUrl} alt={user.nome} className="w-6 h-6 md:w-7 md:h-7 rounded-lg object-cover" />
             ) : (
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+              <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
                 <UserIcon size={14} />
               </div>
             )}
@@ -154,10 +154,10 @@ export default function HomePage() {
               setUser(u)
             }}
             title="Fazer Logoff / Sair da Conta"
-            className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-600 hover:text-red-600 text-[11px] sm:text-xs font-semibold transition-all bg-white shadow-xs"
+            className="flex items-center gap-1 px-2 py-1 md:px-2.5 md:py-1.5 rounded-xl border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-600 hover:text-red-600 text-[11px] md:text-xs font-semibold transition-all bg-white shadow-xs"
           >
             <LogOut size={13} className="text-red-500" />
-            <span className="hidden sm:inline">Sair</span>
+            <span className="hidden md:inline">Sair</span>
           </button>
 
           <Link
@@ -170,7 +170,7 @@ export default function HomePage() {
 
           <button
             onClick={carregarPontos}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-all text-slate-600 border border-slate-300/70 shadow-sm"
+            className="w-7 h-7 md:w-8 md:h-8 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-all text-slate-600 border border-slate-300/70 shadow-sm"
             title="Atualizar mapa"
           >
             <RefreshCw size={13} />
@@ -179,9 +179,9 @@ export default function HomePage() {
       </header>
 
       {/* ══════════════════════════════════════════
-          MOBILE FILTERS BAR — Pill Bar Compacta (Mobile Only)
+          MOBILE FILTERS BAR — Pill Bar Compacta (Mobile Only < 768px)
       ══════════════════════════════════════════ */}
-      <div className="sm:hidden absolute top-14 left-2 right-2 z-20 flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/95 backdrop-blur-xl rounded-2xl shadow-md border border-slate-200/90 no-scrollbar">
+      <div className="md:hidden absolute top-14 left-2 right-2 z-20 flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/95 backdrop-blur-xl rounded-2xl shadow-md border border-slate-200/90 no-scrollbar">
         {[
           { id: 'TODOS', label: 'Todos', count: stats.total, color: '#475569' },
           { id: 'EM_ARRECADACAO', label: '🔵 Pix', count: stats.arrecadacao, color: '#2563eb' },
@@ -210,9 +210,9 @@ export default function HomePage() {
       </div>
 
       {/* ══════════════════════════════════════════
-          DESKTOP HUD ESQUERDO — Painel de Controle (Desktop Only)
+          DESKTOP HUD ESQUERDO — Painel de Controle (Desktop Only >= 768px)
       ══════════════════════════════════════════ */}
-      <div className="hidden sm:block absolute top-24 left-5 z-20 w-60 space-y-3">
+      <div className="hidden md:block absolute top-24 left-5 z-20 w-60 space-y-3">
         {/* Card principal de zeladoria */}
         <div
           className="rounded-2xl p-4 space-y-3.5 bg-white/95 backdrop-blur-xl border border-slate-200/80 shadow-xl"
@@ -276,14 +276,14 @@ export default function HomePage() {
       ══════════════════════════════════════════ */}
       <button
         onClick={() => setModalNovoPonto(true)}
-        className="absolute bottom-20 right-3 sm:bottom-24 sm:right-6 z-20 flex items-center gap-1.5 sm:gap-2.5 px-3.5 py-2.5 sm:px-6 sm:py-4 rounded-full sm:rounded-2xl font-bold text-xs sm:text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-2xl transition-all hover:scale-105 active:scale-95 border border-blue-500/30"
+        className="absolute bottom-20 right-3 md:bottom-24 md:right-6 z-20 flex items-center gap-1.5 md:gap-2.5 px-3.5 py-2.5 md:px-6 md:py-4 rounded-full md:rounded-2xl font-bold text-xs md:text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-2xl transition-all hover:scale-105 active:scale-95 border border-blue-500/30"
       >
         <PlusCircle size={18} />
         <span>
-          <span className="sm:hidden">Mapear</span>
-          <span className="hidden sm:inline">Mapear Ponto de Cuidado</span>
+          <span className="md:hidden">Mapear</span>
+          <span className="hidden md:inline">Mapear Ponto de Cuidado</span>
         </span>
-        <ChevronRight size={15} className="hidden sm:inline" />
+        <ChevronRight size={15} className="hidden md:inline" />
       </button>
 
       {/* ══════════════════════════════════════════
@@ -296,21 +296,21 @@ export default function HomePage() {
         {/* Handle / Toggle */}
         <button
           onClick={() => setFeedAberto((v) => !v)}
-          className="w-full flex items-center justify-between px-3 py-3 sm:px-6 sm:py-4 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl"
+          className="w-full flex items-center justify-between px-3 py-3 md:px-6 md:py-4 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl"
         >
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <Radio size={14} className="text-blue-600 animate-pulse shrink-0" />
-            <span className="text-[11px] sm:text-xs font-bold tracking-wide uppercase text-slate-800 truncate">
-              <span className="sm:hidden">Feed do Bairro</span>
-              <span className="hidden sm:inline">Feed de Zeladoria & Comércios do Bairro</span>
+            <span className="text-[11px] md:text-xs font-bold tracking-wide uppercase text-slate-800 truncate">
+              <span className="md:hidden">Feed do Bairro</span>
+              <span className="hidden md:inline">Feed de Zeladoria & Comércios do Bairro</span>
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <span
-              className="text-[10px] sm:text-xs font-mono font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+              className="text-[10px] md:text-xs font-mono font-bold px-2 py-0.5 md:px-3 md:py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200"
             >
-              <span className="sm:hidden">{pontosFiltrados.length} no bairro</span>
-              <span className="hidden sm:inline">{pontosFiltrados.length} pontos no bairro</span>
+              <span className="md:hidden">{pontosFiltrados.length} no bairro</span>
+              <span className="hidden md:inline">{pontosFiltrados.length} pontos no bairro</span>
             </span>
             <ChevronRight
               size={16}
