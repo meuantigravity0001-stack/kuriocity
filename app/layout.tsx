@@ -32,9 +32,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={inter.variable} data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-      </head>
       <body className="antialiased">{children}</body>
     </html>
   )
