@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google'
 import { User, getRoleBadge } from '@/lib/types'
 import { getCurrentUser, logoutUser } from '@/lib/auth'
 import ModalAuthOnboarding from '@/components/ModalAuthOnboarding'
+import ModalEnviarPrefeitura from '@/components/ModalEnviarPrefeitura'
 import KurioLogo from '@/components/KurioLogo'
 import {
   MapPin,
@@ -23,21 +24,28 @@ import {
   ShieldCheck,
   Camera,
   LogOut,
+  Building2,
+  Send,
+  Sparkles,
+  TrendingDown,
+  Eye,
+  HeartHandshake,
 } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 const CONTAINER_INNER = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full'
 
 export default function LandingPage() {
-  const [user, setUser]           = useState<User>(() => getCurrentUser())
-  const [modalAuth, setModalAuth] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [activeId, setActiveId]   = useState('')
+  const [user, setUser]                 = useState<User>(() => getCurrentUser())
+  const [modalAuth, setModalAuth]       = useState(false)
+  const [modalPrefeitura, setModalPrefeitura] = useState(false)
+  const [mobileOpen, setMobileOpen]     = useState(false)
+  const [activeId, setActiveId]         = useState('')
 
   const badge = getRoleBadge(user.role)
 
   useEffect(() => {
-    const ids = ['como-funciona', 'perfis', 'deducao-fiscal']
+    const ids = ['proposta-prefeitura', 'como-funciona', 'perfis', 'mobilizacao-cidada']
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActiveId(e.target.id)),
       { rootMargin: '-20% 0px -40% 0px', threshold: 0.1 }
@@ -47,9 +55,10 @@ export default function LandingPage() {
   }, [])
 
   const nav = [
-    { href: '#como-funciona', label: 'Como Funciona', id: 'como-funciona' },
-    { href: '#perfis',        label: 'Os Perfis',     id: 'perfis'        },
-    { href: '#deducao-fiscal',label: 'IPTU e Dossiê', id: 'deducao-fiscal'},
+    { href: '#proposta-prefeitura', label: 'Valores para Prefeituras', id: 'proposta-prefeitura' },
+    { href: '#como-funciona',        label: 'Como Funciona',           id: 'como-funciona' },
+    { href: '#perfis',               label: 'Os Perfis',               id: 'perfis' },
+    { href: '#mobilizacao-cidada',   label: 'Mobilizar Minha Cidade',  id: 'mobilizacao-cidada' },
   ]
 
   const scroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -114,7 +123,7 @@ export default function LandingPage() {
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition-all"
             >
               <MapPin size={14} />
-              <span>Mapa</span>
+              <span>Abrir Mapa</span>
             </Link>
 
             <button
@@ -141,21 +150,11 @@ export default function LandingPage() {
             ))}
             <div className="pt-3 mt-2 border-t border-slate-100 space-y-2">
               <button
-                onClick={() => { setMobileOpen(false); setModalAuth(true) }}
-                className="w-full text-center py-2.5 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700"
+                onClick={() => { setMobileOpen(false); setModalPrefeitura(true) }}
+                className="w-full text-center py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-bold flex items-center justify-center gap-2"
               >
-                {badge.emoji} {badge.label} — Gerir Perfil
-              </button>
-              <button
-                onClick={() => {
-                  const u = logoutUser()
-                  setUser(u)
-                  setMobileOpen(false)
-                }}
-                className="w-full text-center py-2.5 rounded-lg border border-red-200 bg-red-50 text-red-600 text-sm font-bold flex items-center justify-center gap-2"
-              >
-                <LogOut size={15} />
-                <span>Fazer Logoff</span>
+                <Send size={15} />
+                <span>Enviar para Minha Cidade</span>
               </button>
               <Link href="/" className="block text-center w-full py-2.5 rounded-lg bg-blue-600 text-white font-bold text-sm">
                 Abrir Mapa Interativo
@@ -171,48 +170,47 @@ export default function LandingPage() {
         {/* ─────────── HERO ─────────── */}
         <section className="py-10 md:py-14 space-y-8 border-b border-slate-200/80">
           <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              Plataforma cívica P2P · LGPD · Pix direto
+            <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3.5 py-1 shadow-xs">
+              <Sparkles size={13} className="text-emerald-600" />
+              Proposta de Valor para Cidades · Projeto de Lei Cívico
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
-              Transforme a sua rua.<br />
-              <span className="text-blue-600">Abata o seu IPTU.</span>
+              Zeladoria inteligente para o seu bairro.<br />
+              <span className="text-blue-600">Uma proposta para a sua Prefeitura.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-              Plataforma cívica para reparar calçadas e buracos com doações
-              Pix diretas entre vizinhos e abatimento fiscal automático.
+              O <strong>Kurió City Tour</strong> é um movimento cívico que conecta moradores, depósitos de bairro e pedreiros locais. Convidamos você a mobilizar a Prefeitura do seu município para adotar esta solução e aprovar o <strong>IPTU Cívico</strong>!
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
+              <button
+                onClick={() => setModalPrefeitura(true)}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all hover:scale-105"
+              >
+                <Send size={16} />
+                <span>Enviar Proposta para Minha Prefeitura</span>
+                <ArrowRight size={15} />
+              </button>
+
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all"
-              >
-                <MapPin size={16} />
-                <span>Explorar Mapa do Bairro</span>
-                <ArrowRight size={15} />
-              </Link>
-
-              <a
-                href="#como-funciona"
-                onClick={(e) => scroll(e, '#como-funciona')}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-all shadow-xs"
               >
-                Como Funciona
-              </a>
+                <MapPin size={16} />
+                <span>Ver Mapa Demonstrativo</span>
+              </Link>
             </div>
           </div>
 
           {/* Proof bar */}
           <div className="pt-6 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Pix 100% direto ao prestador',      icon: <Coins size={16} className="text-blue-600 shrink-0" /> },
-              { label: 'Zero taxas de custódia',            icon: <ShieldCheck size={16} className="text-emerald-600 shrink-0" /> },
-              { label: 'Comprovação por foto e vídeo',      icon: <Camera size={16} className="text-amber-600 shrink-0" /> },
-              { label: 'Dossiê PDF para abatimento IPTU',   icon: <FileText size={16} className="text-purple-600 shrink-0" /> },
+              { label: 'Economia comprovada nos cofres públicos', icon: <TrendingDown size={16} className="text-emerald-600 shrink-0" /> },
+              { label: 'Zero taxas ou custódia para o município',   icon: <ShieldCheck size={16} className="text-blue-600 shrink-0" /> },
+              { label: 'Fiscalização visual com fotos e GPS',    icon: <Eye size={16} className="text-amber-600 shrink-0" /> },
+              { label: 'Fomento ao comércio e pedreiro local',   icon: <Store size={16} className="text-purple-600 shrink-0" /> },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-xs text-sm text-slate-700 font-medium">
                 {item.icon}
@@ -223,19 +221,68 @@ export default function LandingPage() {
         </section>
 
 
-        {/* ─────────── COMO FUNCIONA ─────────── */}
-        <section id="como-funciona" className="scroll-mt-20 py-10 md:py-14 space-y-8 border-b border-slate-200/80">
+        {/* ─────────── PROPOSTA PARA PREFEITURAS ─────────── */}
+        <section id="proposta-prefeitura" className="scroll-mt-20 py-10 md:py-14 space-y-8 border-b border-slate-200/80">
           <div className="max-w-2xl space-y-2">
-            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Como Funciona</p>
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Para Gestores Públicos & Vereadores</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Três passos. Impacto real.
+              Por que a Prefeitura da sua cidade só tem a ganhar?
             </h2>
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed pt-1">
-              Da identificação do problema ao comprovante fiscal, tudo acontece dentro da plataforma.
+              O Kurió City Tour descentraliza a zeladoria urbana, elimina burocracia e economiza dinheiro público de forma transparente.
             </p>
           </div>
 
-          {/* Container dos 3 Passos */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
+            {[
+              {
+                icon: <TrendingDown size={22} className="text-blue-600" />,
+                iconBg: 'bg-blue-50 border-blue-100',
+                title: 'Economia em Licitações',
+                desc: 'Reparos preventivos feitos pela vizinhança custam até 4.5x menos do que obras emergenciais ou processos de indenização de trânsito.',
+              },
+              {
+                icon: <Eye size={22} className="text-emerald-600" />,
+                iconBg: 'bg-emerald-50 border-emerald-100',
+                title: 'Fiscalização em Tempo Real',
+                desc: 'O mapa fornece auditoria gratuita via GPS e fotos Antes/Depois validadas pela própria comunidade sem custo fiscalizatório de campo.',
+              },
+              {
+                icon: <Store size={22} className="text-purple-600" />,
+                iconBg: 'bg-purple-50 border-purple-100',
+                title: 'Comércio Local Fortalecido',
+                desc: 'Todo o valor investido nas melhorias é direcionado aos depósitos de construção do bairro e profissionais locais cadastrados.',
+              },
+            ].map((card, i) => (
+              <div
+                key={i}
+                className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all space-y-4"
+              >
+                <div className={`w-12 h-12 rounded-xl border ${card.iconBg} flex items-center justify-center shrink-0`}>
+                  {card.icon}
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">{card.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+        {/* ─────────── COMO FUNCIONA ─────────── */}
+        <section id="como-funciona" className="scroll-mt-20 py-10 md:py-14 space-y-8 border-b border-slate-200/80">
+          <div className="max-w-2xl space-y-2">
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Como Funciona o Ciclo Cívico</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Três passos simples de zeladoria.
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed pt-1">
+              Da foto no celular à comprovação no Google Drive com zero dados fiscais retidos.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
             {[
               {
@@ -243,21 +290,21 @@ export default function LandingPage() {
                 color: 'blue',
                 icon: <MapPin size={22} />,
                 title: 'Mapeie ou Apoie',
-                desc: 'Identifique um problema na rua com GPS e foto, ou contribua com Pix direto para uma obra já ativa no mapa.',
+                desc: 'Identifique um buraco ou calçada no mapa com foto e GPS, ou apoie financeiramente via Pix P2P direto.',
               },
               {
                 num: '02',
                 color: 'amber',
                 icon: <Camera size={22} />,
                 title: 'Obra Executada',
-                desc: 'O prestador local realiza o serviço e comprova cada etapa (30% → 40% → 30%) com fotos ou vídeo para a comunidade validar.',
+                desc: 'O pedreiro local realiza o reparo e comprova em etapas (30% → 40% → 30%) com mídias validadas pelos vizinhos.',
               },
               {
                 num: '03',
                 color: 'emerald',
                 icon: <FileText size={22} />,
-                title: 'Abatimento no IPTU',
-                desc: 'Receba o Dossiê Cívico em PDF guardado automaticamente no seu Google Drive para protocolo de crédito fiscal.',
+                title: 'Dossiê Cívico',
+                desc: 'Receba o Dossiê em PDF salvo na sua pasta pessoal do Google Drive para apresentar à Prefeitura no futuro programa de IPTU Cívico.',
               },
             ].map(({ num, color, icon, title, desc }, i) => {
               const palette: Record<string, { icon: string; num: string }> = {
@@ -269,7 +316,7 @@ export default function LandingPage() {
               return (
                 <div
                   key={i}
-                  className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 space-y-6"
+                  className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full space-y-6 shadow-sm"
                 >
                   <div className="flex items-start justify-between">
                     <div className={`w-12 h-12 rounded-xl border ${s.icon} flex items-center justify-center shrink-0`}>
@@ -285,40 +332,16 @@ export default function LandingPage() {
               )
             })}
           </div>
-
-          {/* Flow steps indicator */}
-          <div className="p-6 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-4">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Pagamento desbloqueado por etapa aprovada</p>
-            <div className="flex flex-wrap items-center gap-3">
-              {['Etapa 1 — Preparação (30%)', 'Etapa 2 — Execução (40%)', 'Etapa 3 — Finalização (30%)'].map((stepText, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg">
-                    <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
-                    <span>{stepText}</span>
-                  </div>
-                  {i < 2 && <ChevronRight size={14} className="text-slate-300 shrink-0" />}
-                </div>
-              ))}
-              <ArrowRight size={14} className="text-blue-500 shrink-0" />
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg">
-                💸 Pix Liberado
-              </div>
-            </div>
-          </div>
         </section>
 
 
-        {/* ─────────── OS 3 PERFIS ─────────── */}
+        {/* ─────────── OS PERFIS ─────────── */}
         <section id="perfis" className="scroll-mt-20 py-10 md:py-14 space-y-8 border-b border-slate-200/80">
           <div className="max-w-2xl space-y-2">
-            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Os Perfis</p>
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Os Perfis da Comunidade</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Comece como morador.<br />Evolua quando quiser.
+              Moradores, Lojistas e Prestadores unindo forças.
             </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed pt-1">
-              Todos os usuários iniciam como <strong className="text-slate-900">Morador / Cidadão</strong>.
-              Os outros perfis são ativados voluntariamente no painel de conta.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
@@ -326,47 +349,35 @@ export default function LandingPage() {
               {
                 icon: <Footprints size={22} className="text-blue-600" />,
                 iconBg: 'bg-blue-50 border-blue-100',
-                tag: 'Perfil inicial — obrigatório',
-                tagColor: 'text-blue-700 bg-blue-50 border-blue-200',
+                tag: 'Perfil essencial',
                 title: 'Morador / Cidadão',
-                desc: 'Registra problemas urbanos com GPS e foto. Apoia obras via Pix P2P. Recebe o Dossiê de IPTU automaticamente.',
-                benefits: ['Mapear pontos de cuidado', 'Apoiar obras com Pix direto', 'Receber dossiê para IPTU'],
-                cta: 'Cadastrar como Morador',
-                ctaStyle: 'bg-blue-600 hover:bg-blue-700 text-white',
+                desc: 'Identifica reparos e apoia melhorias no bairro com Pix direto.',
+                benefits: ['Mapear problemas de rua', 'Apoiar obras sem intermediários', 'Guardar comprovante no Google Drive'],
               },
               {
                 icon: <Wrench size={22} className="text-amber-600" />,
                 iconBg: 'bg-amber-50 border-amber-100',
-                tag: 'Evolução opcional',
-                tagColor: 'text-amber-700 bg-amber-50 border-amber-200',
+                tag: 'Mão de obra',
                 title: 'Prestador de Serviço',
-                desc: 'Aceita obras próximas e comprova cada etapa com foto/vídeo. Recebe Pix direto após validação da comunidade.',
-                benefits: ['Obras a metros de casa', 'Pix por etapa comprovada', 'Portfólio público no mapa'],
-                cta: 'Ativar Modo Prestador',
-                ctaStyle: 'bg-amber-500 hover:bg-amber-600 text-white',
+                desc: 'Executa a manutenção da rua e recebe Pix direto conforme etapas aprovadas.',
+                benefits: ['Obras no próprio bairro', 'Pix garantido por etapa', 'Portfólio público no mapa'],
               },
               {
                 icon: <Store size={22} className="text-emerald-600" />,
                 iconBg: 'bg-emerald-50 border-emerald-100',
-                tag: 'Evolução opcional',
-                tagColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+                tag: 'Fornecedor',
                 title: 'Comércio Local',
-                desc: 'Fornece materiais de construção com nota fiscal integrada ao Dossiê Cívico do doador para abatimento fiscal.',
-                benefits: ['Cotações diretas no mapa', 'NF no dossiê de IPTU', 'Selo de Loja Parceira'],
-                cta: 'Credenciar Minha Loja',
-                ctaStyle: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+                desc: 'Fornece materiais de construção com cotação direto no mapa cívico.',
+                benefits: ['Mais vendas no bairro', 'Nota fiscal no Dossiê Cívico', 'Selo de Loja Parceira'],
               },
             ].map((card, i) => (
-              <div
-                key={i}
-                className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 space-y-6"
-              >
+              <div key={i} className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full space-y-6 shadow-sm">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div className={`w-12 h-12 rounded-xl border ${card.iconBg} flex items-center justify-center shrink-0`}>
                       {card.icon}
                     </div>
-                    <span className={`text-[11px] font-bold border px-2 py-0.5 rounded-md ${card.tagColor}`}>
+                    <span className="text-[11px] font-bold border px-2 py-0.5 rounded-md text-slate-600 bg-slate-50">
                       {card.tag}
                     </span>
                   </div>
@@ -378,119 +389,51 @@ export default function LandingPage() {
 
                   <ul className="space-y-2 pt-2">
                     {card.benefits.map((b, j) => (
-                      <li key={j} className="flex items-center gap-2.5 text-sm text-slate-700 font-medium">
-                        <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+                      <li key={j} className="flex items-center gap-2.5 text-xs text-slate-700 font-medium">
+                        <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
                         <span>{b}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-
-                <button
-                  onClick={() => setModalAuth(true)}
-                  className={`w-full py-3 px-4 rounded-xl text-sm font-bold transition-all ${card.ctaStyle} shadow-xs`}
-                >
-                  {card.cta}
-                </button>
               </div>
             ))}
           </div>
         </section>
 
 
-        {/* ─────────── IPTU & DOSSIÊ ─────────── */}
-        <section id="deducao-fiscal" className="scroll-mt-20 py-10 md:py-14 space-y-8">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 lg:p-12 text-white space-y-10 shadow-xl">
+        {/* ─────────── MOBILIZAÇÃO CIDADÃ & IPTU CÍVICO ─────────── */}
+        <section id="mobilizacao-cidada" className="scroll-mt-20 py-10 md:py-14 space-y-8">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 lg:p-12 text-white space-y-8 shadow-xl">
             
             <div className="max-w-2xl space-y-2">
-              <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">IPTU e Dossiê Cívico</p>
+              <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                <Building2 size={14} /> Envie este projeto para o Prefeito da sua Cidade
+              </p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                Do Pix ao abatimento de IPTU,<br />
-                <span className="text-blue-400">tudo automático.</span>
+                Quer ver o IPTU Cívico aprovado no seu município?
               </h2>
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed pt-1">
-                Cada centavo doado gera comprovação e mídias salvas diretamente no Google Drive do doador.
-                Zero dados retidos pela plataforma.
+                O desconto no IPTU é uma <strong>proposta de incentivo cívico</strong> que desejamos levar às câmaras municipais de todo o Brasil. Ajude-nos a apresentar esta ideia à Prefeitura do seu município!
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full">
-              {[
-                {
-                  n: '01', icon: <ShieldCheck size={20} className="text-blue-400" />,
-                  t: 'Zero Custódia',
-                  badge: 'Google Drive pessoal (LGPD)',
-                  d: 'Fotos e comprovantes Pix salvos na pasta pessoal do morador. A plataforma não armazena dados fiscais.',
-                  pts: ['Escopo drive.file mínimo', 'Sem servidor intermediário', 'Controle total do titular'],
-                },
-                {
-                  n: '02', icon: <FileText size={20} className="text-purple-400" />,
-                  t: 'Dossiê Cívico PDF',
-                  badge: 'Autenticado por GPS',
-                  d: 'PDF com geolocalização, fotos Antes/Depois, notas fiscais das lojas e comprovantes Pix P2P.',
-                  pts: ['Protocolo único por Ponto', 'Comprovação visual e GPS', 'NF de loja local anexada'],
-                },
-                {
-                  n: '03', icon: <Coins size={20} className="text-emerald-400" />,
-                  t: 'Crédito no IPTU',
-                  badge: 'Legislação municipal',
-                  d: 'O morador protocola o Dossiê na Prefeitura para solicitar crédito proporcional no imposto predial.',
-                  pts: ['Até R$ 1.890 economizados', 'Embasamento jurídico incluso', 'Protocolo digital válido'],
-                },
-              ].map((s, i) => (
-                <div key={i} className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 md:p-8 flex flex-col justify-between h-full space-y-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-700 flex items-center justify-center font-black text-sm text-white shrink-0">
-                        {s.n}
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {s.icon}
-                        <span className="text-[11px] font-semibold text-slate-300 bg-slate-700/80 px-2 py-0.5 rounded-md">{s.badge}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-white text-base mb-1">{s.t}</h3>
-                      <p className="text-sm text-slate-300 leading-relaxed">{s.d}</p>
-                    </div>
-                  </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+              <button
+                onClick={() => setModalPrefeitura(true)}
+                className="px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-105"
+              >
+                <Send size={16} />
+                <span>Enviar Apresentação Oficial para Minha Prefeitura</span>
+              </button>
 
-                  <ul className="space-y-2 pt-4 border-t border-slate-700/80">
-                    {s.pts.map((p, j) => (
-                      <li key={j} className="flex items-center gap-2 text-xs text-slate-300 font-medium">
-                        <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-
-            {/* Example calculation */}
-            <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-6 md:p-8 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-700/80">
-                <div>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Exemplo de compensação tributária</p>
-                  <h4 className="text-base font-extrabold text-white">Ponto #17 — Calçada com Piso Tátil, Centro</h4>
-                </div>
-                <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg self-start sm:self-auto">
-                  DOSSIÊ-IPTU-17-1280
-                </span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { l: 'Investimento comunitário',    v: 'R$ 420,00',  s: 'Via Pix P2P entre vizinhos',      c: 'text-emerald-400' },
-                  { l: 'Economia pública estimada',   v: 'R$ 1.890,00',s: 'vs. orçamento de licitação',     c: 'text-blue-400'    },
-                  { l: 'Retorno ao doador no IPTU',   v: 'Até 100%',   s: 'Proporcional ao valor doado',    c: 'text-purple-400'  },
-                ].map((item, i) => (
-                  <div key={i} className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-4 space-y-1">
-                    <p className="text-xs text-slate-400 font-semibold">{item.l}</p>
-                    <p className={`text-2xl font-black ${item.c}`}>{item.v}</p>
-                    <p className="text-xs text-slate-400">{item.s}</p>
-                  </div>
-                ))}
-              </div>
+              <Link
+                href="/"
+                className="px-6 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-sm flex items-center justify-center gap-2 transition-all"
+              >
+                <MapPin size={16} />
+                <span>Explorar Mapa do Bairro</span>
+              </Link>
             </div>
 
           </div>
@@ -525,6 +468,7 @@ export default function LandingPage() {
       </footer>
 
       {modalAuth && <ModalAuthOnboarding onClose={() => setModalAuth(false)} onSuccess={(u) => setUser(u)} />}
+      {modalPrefeitura && <ModalEnviarPrefeitura onClose={() => setModalPrefeitura(false)} />}
     </div>
   )
 }
