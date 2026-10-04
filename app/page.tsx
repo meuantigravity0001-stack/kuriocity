@@ -113,19 +113,19 @@ export default function HomePage() {
           HUD SUPERIOR — Header com Autenticação e Perfil (Role)
       ══════════════════════════════════════════ */}
       <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-3.5 shadow-md backdrop-blur-xl bg-white/95 border-b border-slate-200/80"
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 shadow-md backdrop-blur-xl bg-white/95 border-b border-slate-200/80"
       >
         {/* Logo & Tagline */}
         <Link href="/home" className="hover:opacity-90 transition-opacity">
-          <KurioLogo className="h-9" />
+          <KurioLogo className="h-7 sm:h-9" />
         </Link>
 
         {/* User Profile Badge & Role Selector */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Badge Perfil de Atuação */}
           <button
             onClick={() => setModalAuth(true)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-sm transition-all hover:scale-105 ${roleBadge.badgeClass}`}
+            className={`flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-semibold shadow-sm transition-all hover:scale-105 ${roleBadge.badgeClass}`}
             title="Clique para alterar seu modo de atuação (Cidadão / Loja / Prestador)"
           >
             <span>{roleBadge.emoji}</span>
@@ -135,12 +135,12 @@ export default function HomePage() {
           {/* User Avatar */}
           <button
             onClick={() => setModalAuth(true)}
-            className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 transition-all border border-slate-200"
+            className="flex items-center gap-1 sm:gap-2 p-1 rounded-xl hover:bg-slate-100 transition-all border border-slate-200"
           >
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.nome} className="w-7 h-7 rounded-lg object-cover" />
+              <img src={user.avatarUrl} alt={user.nome} className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover" />
             ) : (
-              <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
                 <UserIcon size={14} />
               </div>
             )}
@@ -154,9 +154,9 @@ export default function HomePage() {
               setUser(u)
             }}
             title="Fazer Logoff / Sair da Conta"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-600 hover:text-red-600 text-xs font-semibold transition-all bg-white shadow-xs"
+            className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-600 hover:text-red-600 text-[11px] sm:text-xs font-semibold transition-all bg-white shadow-xs"
           >
-            <LogOut size={14} className="text-red-500" />
+            <LogOut size={13} className="text-red-500" />
             <span className="hidden sm:inline">Sair</span>
           </button>
 
@@ -170,18 +170,49 @@ export default function HomePage() {
 
           <button
             onClick={carregarPontos}
-            className="w-8 h-8 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-all text-slate-600 border border-slate-300/70 ml-1 shadow-sm"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-all text-slate-600 border border-slate-300/70 shadow-sm"
             title="Atualizar mapa"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={13} />
           </button>
         </div>
       </header>
 
       {/* ══════════════════════════════════════════
-          HUD ESQUERDO — Painel de Controle e Filtros Clean
+          MOBILE FILTERS BAR — Pill Bar Compacta (Mobile Only)
       ══════════════════════════════════════════ */}
-      <div className="absolute top-24 left-5 z-20 w-60 space-y-3">
+      <div className="sm:hidden absolute top-14 left-2 right-2 z-20 flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/95 backdrop-blur-xl rounded-2xl shadow-md border border-slate-200/90 no-scrollbar">
+        {[
+          { id: 'TODOS', label: 'Todos', count: stats.total, color: '#475569' },
+          { id: 'EM_ARRECADACAO', label: '🔵 Pix', count: stats.arrecadacao, color: '#2563eb' },
+          { id: 'EM_EXECUCAO', label: '🟡 Obra', count: stats.execucao, color: '#d97706' },
+          { id: 'CONCLUIDO', label: '🟢 Vitórias', count: stats.concluido, color: '#16a34a' },
+        ].map((f) => (
+          <button
+            key={f.id}
+            onClick={() => setFiltroStatus(f.id)}
+            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shrink-0 transition-all ${
+              filtroStatus === f.id
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            {f.label} ({f.count})
+          </button>
+        ))}
+
+        <button
+          onClick={() => setModalDossieIPTU(true)}
+          className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200 shrink-0 flex items-center gap-1"
+        >
+          <FileText size={12} /> IPTU
+        </button>
+      </div>
+
+      {/* ══════════════════════════════════════════
+          DESKTOP HUD ESQUERDO — Painel de Controle (Desktop Only)
+      ══════════════════════════════════════════ */}
+      <div className="hidden sm:block absolute top-24 left-5 z-20 w-60 space-y-3">
         {/* Card principal de zeladoria */}
         <div
           className="rounded-2xl p-4 space-y-3.5 bg-white/95 backdrop-blur-xl border border-slate-200/80 shadow-xl"
@@ -245,11 +276,14 @@ export default function HomePage() {
       ══════════════════════════════════════════ */}
       <button
         onClick={() => setModalNovoPonto(true)}
-        className="absolute bottom-24 right-6 z-20 flex items-center gap-2.5 px-6 py-4 rounded-2xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-xl transition-all hover:scale-105 active:scale-95 border border-blue-500/30"
+        className="absolute bottom-20 right-3 sm:bottom-24 sm:right-6 z-20 flex items-center gap-1.5 sm:gap-2.5 px-3.5 py-2.5 sm:px-6 sm:py-4 rounded-full sm:rounded-2xl font-bold text-xs sm:text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-2xl transition-all hover:scale-105 active:scale-95 border border-blue-500/30"
       >
-        <PlusCircle size={19} />
-        <span>Mapear Ponto de Cuidado</span>
-        <ChevronRight size={16} />
+        <PlusCircle size={18} />
+        <span>
+          <span className="sm:hidden">Mapear</span>
+          <span className="hidden sm:inline">Mapear Ponto de Cuidado</span>
+        </span>
+        <ChevronRight size={15} className="hidden sm:inline" />
       </button>
 
       {/* ══════════════════════════════════════════
@@ -257,27 +291,29 @@ export default function HomePage() {
       ══════════════════════════════════════════ */}
       <div
         className="absolute bottom-0 left-0 right-0 z-30 transition-all duration-300 ease-out"
-        style={{ transform: feedAberto ? 'translateY(0)' : 'translateY(calc(100% - 60px))' }}
+        style={{ transform: feedAberto ? 'translateY(0)' : 'translateY(calc(100% - 56px))' }}
       >
         {/* Handle / Toggle */}
         <button
           onClick={() => setFeedAberto((v) => !v)}
-          className="w-full flex items-center justify-between px-6 py-4 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl"
+          className="w-full flex items-center justify-between px-3 py-3 sm:px-6 sm:py-4 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl"
         >
-          <div className="flex items-center gap-3">
-            <Radio size={15} className="text-blue-600 animate-pulse" />
-            <span className="text-xs font-bold tracking-wide uppercase text-slate-800">
-              Feed de Zeladoria & Comércios do Bairro
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Radio size={14} className="text-blue-600 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs font-bold tracking-wide uppercase text-slate-800 truncate">
+              <span className="sm:hidden">Feed do Bairro</span>
+              <span className="hidden sm:inline">Feed de Zeladoria & Comércios do Bairro</span>
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <span
-              className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+              className="text-[10px] sm:text-xs font-mono font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200"
             >
-              {pontosFiltrados.length} pontos no bairro
+              <span className="sm:hidden">{pontosFiltrados.length} no bairro</span>
+              <span className="hidden sm:inline">{pontosFiltrados.length} pontos no bairro</span>
             </span>
             <ChevronRight
-              size={18}
+              size={16}
               className="text-slate-500 transition-transform duration-300"
               style={{ transform: feedAberto ? 'rotate(-90deg)' : 'rotate(90deg)' }}
             />
