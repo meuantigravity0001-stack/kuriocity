@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const qrCodePayload = gerarPayloadPixStatico({
       chavePix: chavePixDestino,
       nomeRecebedor: nomeRecebedor || 'Lojista Parceiro',
-      cidadeRecebedor: cidadeRecebedor || 'Brasilia',
+      cidadeRecebedor: cidadeRecebedor || 'Cidade Local',
       valor: valorNum,
       txid: `KURIOCITY${pontoCuidadoId.substring(0, 5).toUpperCase()}`,
     })

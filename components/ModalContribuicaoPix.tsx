@@ -54,7 +54,7 @@ export default function ModalContribuicaoPix({ ponto, onClose, onSuccess }: Moda
           valor,
           chavePixDestino: ponto.orcamentoLoja?.chavePixLoja || '12.345.678/0001-90',
           nomeRecebedor: ponto.orcamentoLoja?.nomeLoja || 'Depósito do Bairro',
-          cidadeRecebedor: ponto.cidade || 'Brasilia',
+          cidadeRecebedor: ponto.cidade || 'Cidade Local',
         }),
       })
       const data = await res.json()

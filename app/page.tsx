@@ -61,6 +61,39 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [feedAberto, setFeedAberto] = useState(false)
   const [filtroStatus, setFiltroStatus] = useState<string>('TODOS')
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lon: number } | undefined>(undefined)
+
+  // Resolve coordenadas iniciais do mapa a partir do endereço cadastrado ou geolocalização
+  useEffect(() => {
+    async function resolverCoordenadas() {
+      // 1. Tentar geocodificar o endereço cadastrado do usuário
+      const endereco = (user as any).endereco || (user as any).enderecoLoja
+      if (endereco) {
+        try {
+          const query = encodeURIComponent(endereco + ', Brasil')
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`,
+            { headers: { 'Accept-Language': 'pt-BR' } }
+          )
+          const data = await res.json()
+          if (data && data[0]) {
+            setMapCenter({ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) })
+            return
+          }
+        } catch (_) {}
+      }
+      // 2. Fallback: geolocalização do browser (silenciosa, sem popup)
+      if (typeof window !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+          () => { /* silencioso — o mapa usa o centro do Brasil como último recurso */ },
+          { timeout: 4000, maximumAge: 300000 }
+        )
+      }
+    }
+    resolverCoordenadas()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id])
 
   const carregarPontos = useCallback(async () => {
     try {
@@ -102,6 +135,7 @@ export default function HomePage() {
         <TabuleiroDinamico
           pontos={pontosFiltrados}
           pontoSelecionado={pontoSelecionado}
+          initialCenter={mapCenter}
           onMarkerClick={(p) => {
             setPontoSelecionado(p)
             setFeedAberto(true)

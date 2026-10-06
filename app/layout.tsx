@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     'Kurió City Tour — Zeladoria colaborativa e exploração urbana conectada.',
   keywords: ['kurió city tour', 'kurio', 'zeladoria urbana', 'cidadania', 'pix p2p', 'mapa cívico', 'IPTU', 'comércio local'],
   authors: [{ name: 'Kurió City Tour' }],
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
   openGraph: {
     title: 'Kurió City Tour — Zeladoria Colaborativa & Conexão Local',
     description: 'Kurió City Tour — Zeladoria colaborativa e exploração urbana conectada.',

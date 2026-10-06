@@ -483,48 +483,72 @@ export default function ModalPontoCuidado({ onClose, onSuccess }: ModalPontoCuid
                   <HardHat size={15} /> 👷 Mão de Obra (Execução)
                 </div>
 
-                {/* Seletor de modo */}
-                <div className="grid grid-cols-3 gap-2">
+                {/* Seletor de modo — cards verticais */}
+                <div className="space-y-2">
                   {[
                     {
                       key: 'aberto' as ModoMaoDeObra,
-                      icon: <UserPlus size={15} />,
-                      label: 'Ponto Aberto',
-                      desc: 'Prestadores se candidatam',
-                      color: 'border-blue-500 bg-blue-500/10 text-blue-300',
-                      inactive: 'border-gray-800 text-gray-500 hover:border-gray-700',
-                    },
-                    {
-                      key: 'comunidade' as ModoMaoDeObra,
-                      icon: <Users size={15} />,
-                      label: 'Pedir Indicação',
-                      desc: 'Vizinhança sugere alguém',
-                      color: 'border-purple-500 bg-purple-500/10 text-purple-300',
-                      inactive: 'border-gray-800 text-gray-500 hover:border-gray-700',
+                      emoji: '🏗️',
+                      label: 'Publicar em Aberto',
+                      desc: 'Prestadores cadastrados se candidatam. A vizinhança aprova antes do Pix.',
+                      badge: 'Mais usado',
+                      badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                      activeStyle: 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/30',
+                      inactiveStyle: 'border-gray-800 hover:border-gray-600 hover:bg-gray-800/50',
+                      activeText: 'text-blue-200',
                     },
                     {
                       key: 'informar' as ModoMaoDeObra,
-                      icon: <HardHat size={15} />,
-                      label: 'Já Sei Quem',
-                      desc: 'Informar o prestador',
-                      color: 'border-green-500 bg-green-500/10 text-green-300',
-                      inactive: 'border-gray-800 text-gray-500 hover:border-gray-700',
+                      emoji: '🤝',
+                      label: 'Já tenho o profissional',
+                      desc: 'Informe nome e Pix de quem vai executar. A obra sai direto para ele.',
+                      badge: 'Mais rápido',
+                      badgeColor: 'bg-green-500/20 text-green-300 border-green-500/30',
+                      activeStyle: 'border-green-500 bg-green-500/10 ring-1 ring-green-500/30',
+                      inactiveStyle: 'border-gray-800 hover:border-gray-600 hover:bg-gray-800/50',
+                      activeText: 'text-green-200',
+                    },
+                    {
+                      key: 'comunidade' as ModoMaoDeObra,
+                      emoji: '📣',
+                      label: 'Pedir indicação da vizinhança',
+                      desc: 'Moradores sugerem profissionais nos comentários. Você aprova a indicação.',
+                      badge: 'Comunitário',
+                      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                      activeStyle: 'border-purple-500 bg-purple-500/10 ring-1 ring-purple-500/30',
+                      inactiveStyle: 'border-gray-800 hover:border-gray-600 hover:bg-gray-800/50',
+                      activeText: 'text-purple-200',
                     },
                   ].map((m) => (
                     <button
                       key={m.key}
                       type="button"
                       onClick={() => setModoMaoDeObra(m.key)}
-                      className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-center transition-all ${
-                        modoMaoDeObra === m.key ? m.color : m.inactive
+                      className={`w-full text-left flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
+                        modoMaoDeObra === m.key ? m.activeStyle : m.inactiveStyle
                       }`}
                     >
-                      {m.icon}
-                      <span className="text-[11px] font-bold leading-tight">{m.label}</span>
-                      <span className="text-[9px] opacity-70 leading-tight">{m.desc}</span>
+                      <span className="text-2xl shrink-0">{m.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs font-extrabold ${modoMaoDeObra === m.key ? m.activeText : 'text-gray-300'}`}>
+                            {m.label}
+                          </span>
+                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${m.badgeColor}`}>
+                            {m.badge}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">{m.desc}</p>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-all ${
+                        modoMaoDeObra === m.key ? 'border-current bg-current' : 'border-gray-700'
+                      }`}>
+                        {modoMaoDeObra === m.key && <div className="w-1.5 h-1.5 rounded-full bg-gray-950" />}
+                      </div>
                     </button>
                   ))}
                 </div>
+
 
                 {/* Conteúdo dinâmico por modo */}
                 {modoMaoDeObra === 'informar' && (

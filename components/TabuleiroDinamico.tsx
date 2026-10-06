@@ -8,12 +8,15 @@ interface TabuleiroDinamicoProps {
   pontos: PontoDeCuidado[]
   pontoSelecionado?: PontoDeCuidado | null
   onMarkerClick?: (p: PontoDeCuidado) => void
+  /** Coordenadas de centro inicial (endereço do usuário ou geolocalização) */
+  initialCenter?: { lat: number; lon: number }
 }
 
 export default function TabuleiroDinamico({
   pontos,
   pontoSelecionado,
   onMarkerClick,
+  initialCenter,
 }: TabuleiroDinamicoProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
@@ -37,8 +40,10 @@ export default function TabuleiroDinamico({
       })
 
       // Centralizar no Bairro / Cidade Local (Zoom Nível 14 para visualização de ruas e lojas)
-      const initialLat = pontos.length > 0 ? pontos[0].latitude : -15.7942
-      const initialLon = pontos.length > 0 ? pontos[0].longitude : -47.8822
+      // Prioridade: 1) endereço/geoloc do usuário, 2) primeiro ponto existente, 3) centro do Brasil
+      const CENTRO_BRASIL = { lat: -14.235, lon: -51.925 }
+      const initialLat = initialCenter?.lat ?? (pontos.length > 0 ? pontos[0].latitude : CENTRO_BRASIL.lat)
+      const initialLon = initialCenter?.lon ?? (pontos.length > 0 ? pontos[0].longitude : CENTRO_BRASIL.lon)
 
       const map = L.map(mapRef.current!, {
         center: [initialLat, initialLon],
@@ -80,6 +85,14 @@ export default function TabuleiroDinamico({
       })
     }
   }, [pontoSelecionado])
+
+  // Reposicionar mapa quando initialCenter chegar de forma assíncrona (geocoding do endereço do usuário)
+  useEffect(() => {
+    if (mapInstanceRef.current && initialCenter && !pontoSelecionado) {
+      mapInstanceRef.current.flyTo([initialCenter.lat, initialCenter.lon], 14, { duration: 1.5 })
+    }
+  }, [initialCenter, pontoSelecionado])
+
 
   // Atualizar marcadores quando pontos de cuidado mudarem
   useEffect(() => {

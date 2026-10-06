@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { User, UserRole } from '@/lib/types'
-import { saveUserSession, getCurrentUser, canDisableRoleMode, logoutUser, DEMO_USERS, switchDemoUser, GUEST_USER } from '@/lib/auth'
+import { saveUserSession, getCurrentUser, canDisableRoleMode, logoutUser, DEMO_USERS, switchDemoUser } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 import {
   X,
   Store,
@@ -45,6 +46,7 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
   // Form Novo/Editar Usuário
   const [nome, setNome] = useState(currentUser.nome && currentUser.id !== 'guest-user' ? currentUser.nome : '')
   const [email, setEmail] = useState(currentUser.email || '')
+  const [senha, setSenha] = useState('')
   const [telefone, setTelefone] = useState(currentUser.telefone || '')
   const [endereco, setEndereco] = useState(currentUser.endereco || '')
   const [chavePixPessoal, setChavePixPessoal] = useState(currentUser.chavePixPessoal || '')
@@ -65,6 +67,10 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
   // Alerta de Bloqueio de Desativação
   const [alertaBloqueio, setAlertaBloqueio] = useState<string | null>(null)
   const [sucessoMensagem, setSucessoMensagem] = useState<string | null>(null)
+  const [erroAuth, setErroAuth] = useState<string | null>(null)
+  const [loadingAuth, setLoadingAuth] = useState(false)
+  // Modo do painel de acesso: login (já tem conta) ou cadastro (novo)
+  const [authModo, setAuthModo] = useState<'login' | 'cadastro'>('cadastro')
 
   const handleLogoff = () => {
     const guestUser = logoutUser()
@@ -88,29 +94,138 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
     }, 1200)
   }
 
-  // Salvar Novo/Editar Cadastro de Morador
-  const handleSalvarMorador = (e: React.FormEvent) => {
+  // Login com Google OAuth
+  const handleGoogleLogin = async () => {
+    setLoadingAuth(true)
+    setErroAuth(null)
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) {
+      setErroAuth('Erro ao conectar com o Google. Tente novamente.')
+      setLoadingAuth(false)
+    }
+    // Se sucesso, o Supabase redireciona — não precisa fazer nada aqui
+  }
+
+  // Login com e-mail e senha (usuário já cadastrado)
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email || !senha) { setErroAuth('Preencha e-mail e senha.'); return }
+    setLoadingAuth(true)
+    setErroAuth(null)
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha })
+    if (error) {
+      setErroAuth('E-mail ou senha incorretos. Verifique e tente novamente.')
+      setLoadingAuth(false)
+      return
+    }
+    const meta = data.user?.user_metadata || {}
     const updated: User = {
       ...currentUser,
-      id: currentUser.id === 'guest-user' ? `user-custom-${Date.now()}` : currentUser.id,
-      nome: nome || 'Cidadão Kurió',
-      email: email || 'cidadao@kuriocitytour.org.br',
-      telefone: telefone || '(11) 98765-4321',
-      endereco: endereco || 'Bairro Central',
-      chavePixPessoal: chavePixPessoal || telefone || '11987654321',
+      id: data.user!.id,
+      nome: meta.nome || data.user!.email?.split('@')[0] || 'Usuário',
+      email: data.user!.email!,
+      telefone: meta.telefone || '',
+      endereco: meta.endereco || '',
+      chavePixPessoal: meta.chavePixPessoal || '',
       role: 'CIDADAO',
-      modoPrestadorAtivo: modoPrestadorAtivo,
-      modoComercianteAtivo: modoComercianteAtivo,
+      modoPrestadorAtivo: false,
+      modoComercianteAtivo: false,
     }
     const saved = saveUserSession(updated)
     setCurrentUser(saved)
-    setSucessoMensagem('✅ Perfil salvo e sessão iniciada com sucesso!')
+    setLoadingAuth(false)
+    setSucessoMensagem(`✅ Bem-vindo(a) de volta, ${updated.nome}!`)
+    setTab('sucesso')
+    setTimeout(() => { onSuccess(saved); onClose() }, 1400)
+  }
+
+  // Salvar Novo/Editar Cadastro de Morador — agora conectado ao Supabase Auth
+  const handleSalvarMorador = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !senha) {
+      setErroAuth('E-mail e senha são obrigatórios.')
+      return
+    }
+    if (senha.length < 6) {
+      setErroAuth('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
+    setLoadingAuth(true)
+    setErroAuth(null)
+
+    const perfilMetadata = {
+      nome: nome || 'Cidadão Kurió',
+      telefone: telefone || '',
+      endereco: endereco || '',
+      chavePixPessoal: chavePixPessoal || '',
+    }
+
+    // Tenta CADASTRO primeiro; se e-mail já existe, tenta LOGIN
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password: senha,
+      options: { data: perfilMetadata },
+    })
+
+    let authUserId: string | undefined
+    let authEmail: string | undefined
+
+    if (signUpError) {
+      // E-mail já cadastrado → tenta login
+      if (
+        signUpError.message?.toLowerCase().includes('already registered') ||
+        signUpError.message?.toLowerCase().includes('email already') ||
+        signUpError.status === 400
+      ) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password: senha,
+        })
+        if (signInError) {
+          setErroAuth('E-mail já cadastrado. Senha incorreta. Tente novamente.')
+          setLoadingAuth(false)
+          return
+        }
+        authUserId = signInData.user?.id
+        authEmail = signInData.user?.email
+        // Atualiza metadados com dados mais recentes
+        await supabase.auth.updateUser({ data: perfilMetadata })
+      } else {
+        setErroAuth(signUpError.message || 'Erro ao criar conta. Tente novamente.')
+        setLoadingAuth(false)
+        return
+      }
+    } else {
+      authUserId = signUpData.user?.id
+      authEmail = signUpData.user?.email
+    }
+
+    const updated: User = {
+      ...currentUser,
+      id: authUserId || `user-custom-${Date.now()}`,
+      nome: perfilMetadata.nome,
+      email: authEmail || email,
+      telefone: perfilMetadata.telefone,
+      endereco: perfilMetadata.endereco,
+      chavePixPessoal: perfilMetadata.chavePixPessoal,
+      role: 'CIDADAO',
+      modoPrestadorAtivo: false,
+      modoComercianteAtivo: false,
+    }
+
+    const saved = saveUserSession(updated)
+    setCurrentUser(saved)
+    setLoadingAuth(false)
+    setSucessoMensagem('✅ Conta criada com sucesso! Bem-vindo(a) ao Kurió City Tour.')
     setTab('sucesso')
     setTimeout(() => {
       onSuccess(saved)
       onClose()
-    }, 1200)
+    }, 1400)
   }
 
   // Toggle do Modo Prestador com Trava de Segurança
@@ -352,103 +467,195 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
             </div>
           )}
 
-          {/* TAB 2: CRIAR / ENTRAR COM NOVO USUÁRIO */}
+          {/* TAB 2: ENTRAR / CRIAR CONTA */}
           {tab === 'novo_usuario' && (
-            <form onSubmit={handleSalvarMorador} className="space-y-4">
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Cadastro / Login Personalizado</h4>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Digite seus dados para entrar com um perfil próprio no Kurió City Tour.
-                </p>
+            <div className="space-y-4">
+
+              {/* Botão Google OAuth */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loadingAuth}
+                className="w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all flex items-center justify-center gap-3 shadow-sm disabled:opacity-60"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </svg>
+                Continuar com Google
+              </button>
+
+              {/* Divisor */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-slate-200" />
+                <span className="text-xs text-slate-400 font-semibold">ou acesse com e-mail</span>
+                <div className="flex-1 h-px bg-slate-200" />
               </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Seu Nome Completo</label>
-                  <div className="relative">
-                    <UserIcon size={16} className="absolute left-3.5 top-3 text-slate-400" />
-                    <input
-                      type="text"
-                      required
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      placeholder="Ex: Maria Fernandes"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
+              {/* Toggle Login / Cadastro */}
+              <div className="flex bg-slate-100 rounded-2xl p-1 gap-1">
+                <button
+                  type="button"
+                  onClick={() => { setAuthModo('login'); setErroAuth(null) }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all ${
+                    authModo === 'login'
+                      ? 'bg-white text-blue-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  🔑 Já tenho conta — Entrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthModo('cadastro'); setErroAuth(null) }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all ${
+                    authModo === 'cadastro'
+                      ? 'bg-white text-blue-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  ✨ Criar nova conta
+                </button>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* FORMULÁRIO LOGIN */}
+              {authModo === 'login' && (
+                <form onSubmit={handleLogin} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">E-mail de Acesso</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">E-mail</label>
                     <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      type="email" required value={email}
+                      onChange={(e) => { setEmail(e.target.value); setErroAuth(null) }}
                       placeholder="maria@email.com"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">WhatsApp / Telefone</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Senha</label>
                     <div className="relative">
-                      <Phone size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
                       <input
-                        type="text"
-                        required
-                        value={telefone}
-                        onChange={(e) => setTelefone(e.target.value)}
-                        placeholder="(11) 91234-5678"
+                        type="password" required value={senha}
+                        onChange={(e) => { setSenha(e.target.value); setErroAuth(null) }}
+                        placeholder="Sua senha"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       />
                     </div>
                   </div>
-                </div>
+                  {erroAuth && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2">
+                      <AlertTriangle size={14} className="shrink-0" />{erroAuth}
+                    </div>
+                  )}
+                  <button type="submit" disabled={loadingAuth}
+                    className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-extrabold text-sm shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  >
+                    {loadingAuth
+                      ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /><span>Entrando...</span></>
+                      : <><span>Entrar na minha conta</span><ArrowRight size={16} /></>
+                    }
+                  </button>
+                  <p className="text-center text-xs text-slate-400">
+                    Não tem conta? <button type="button" onClick={() => setAuthModo('cadastro')} className="text-blue-600 font-bold hover:underline">Criar agora →</button>
+                  </p>
+                </form>
+              )}
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Endereço no Bairro / Cidade</label>
-                  <div className="relative">
-                    <MapPin size={16} className="absolute left-3.5 top-3 text-slate-400" />
-                    <input
-                      type="text"
-                      required
-                      value={endereco}
-                      onChange={(e) => setEndereco(e.target.value)}
-                      placeholder="Ex: Rua São Paulo, 350 - Bairro Verde"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
+              {/* FORMULÁRIO CADASTRO */}
+              {authModo === 'cadastro' && (
+                <form onSubmit={handleSalvarMorador} className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Seu Nome Completo</label>
+                    <div className="relative">
+                      <UserIcon size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <input type="text" required value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                        placeholder="Ex: Maria Fernandes"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Chave Pix Pessoal (Para Reembolsos/IPTU)</label>
-                  <div className="relative">
-                    <QrCode size={16} className="absolute left-3.5 top-3 text-slate-400" />
-                    <input
-                      type="text"
-                      required
-                      value={chavePixPessoal}
-                      onChange={(e) => setChavePixPessoal(e.target.value)}
-                      placeholder="CPF, E-mail ou Telefone"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">E-mail</label>
+                      <input type="email" required value={email}
+                        onChange={(e) => { setEmail(e.target.value); setErroAuth(null) }}
+                        placeholder="maria@email.com"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">WhatsApp</label>
+                      <div className="relative">
+                        <Phone size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                        <input type="text" value={telefone}
+                          onChange={(e) => setTelefone(e.target.value)}
+                          placeholder="(11) 91234-5678"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Senha de Acesso</label>
+                    <div className="relative">
+                      <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <input type="password" required value={senha}
+                        onChange={(e) => { setSenha(e.target.value); setErroAuth(null) }}
+                        placeholder="Mínimo 6 caracteres"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Endereço no Bairro / Cidade</label>
+                    <div className="relative">
+                      <MapPin size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <input type="text" value={endereco}
+                        onChange={(e) => setEndereco(e.target.value)}
+                        placeholder="Ex: Rua São Paulo, 350 - Bairro Verde"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Chave Pix Pessoal (Para Reembolsos/IPTU)</label>
+                    <div className="relative">
+                      <QrCode size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <input type="text" value={chavePixPessoal}
+                        onChange={(e) => setChavePixPessoal(e.target.value)}
+                        placeholder="CPF, E-mail ou Telefone"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  {erroAuth && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2">
+                      <AlertTriangle size={14} className="shrink-0" />{erroAuth}
+                    </div>
+                  )}
+                  <button type="submit" disabled={loadingAuth}
+                    className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-extrabold text-sm shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  >
+                    {loadingAuth
+                      ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /><span>Criando conta...</span></>
+                      : <><span>Criar minha conta</span><ArrowRight size={16} /></>
+                    }
+                  </button>
+                  <p className="text-center text-xs text-slate-400">
+                    Já tem conta? <button type="button" onClick={() => setAuthModo('login')} className="text-blue-600 font-bold hover:underline">← Entrar</button>
+                  </p>
+                </form>
+              )}
 
-              <button
-                type="submit"
-                className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
-              >
-                <span>Entrar & Salvar Meu Perfil</span>
-                <ArrowRight size={16} />
-              </button>
-            </form>
+            </div>
           )}
 
           {/* TAB 3: GERENCIAR PERFIS & EVOLUÇÃO (TOGGLES ON/OFF) */}
           {tab === 'gerenciar_perfis' && (
+
             <div className="space-y-5">
               <div className="pb-3 border-b border-slate-200">
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Usuário Atual</span>
