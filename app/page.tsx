@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { PontoDeCuidado, User, getStatusConfig, getRoleBadge } from '@/lib/types'
-import { getCurrentUser, logoutUser } from '@/lib/auth'
+import { getCurrentUser, logoutUser, saveUserSession } from '@/lib/auth'
 import ModalPontoCuidado from '@/components/ModalPontoCuidado'
 import ModalContribuicaoPix from '@/components/ModalContribuicaoPix'
 import ModalProofOfWork from '@/components/ModalProofOfWork'
@@ -107,6 +107,57 @@ export default function HomePage() {
     }
   }, [])
 
+  // Sincronizar sessão do Supabase (Google OAuth / E-mail / Password) com o usuário local
+  useEffect(() => {
+    import('@/lib/supabase').then(({ supabase }) => {
+      // 1. Verificar se já existe uma sessão ativa no Supabase no carregamento inicial
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const u = session.user
+          const meta = u.user_metadata || {}
+          const current = getCurrentUser()
+          const syncUser: User = {
+            ...current,
+            id: u.id,
+            email: u.email || current.email,
+            nome: meta.nome || meta.full_name || u.email?.split('@')[0] || 'Cidadão Kurió',
+            avatarUrl: meta.avatar_url || meta.picture || current.avatarUrl,
+            telefone: meta.telefone || current.telefone || '',
+            endereco: meta.endereco || current.endereco || '',
+            chavePixPessoal: meta.chavePixPessoal || current.chavePixPessoal || '',
+            role: current.role || 'CIDADAO',
+          }
+          saveUserSession(syncUser)
+          setUser(syncUser)
+        }
+      })
+
+      // 2. Escutar mudanças de autenticação (OAuth redirect, login, logout)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const u = session.user
+          const meta = u.user_metadata || {}
+          const current = getCurrentUser()
+          const syncUser: User = {
+            ...current,
+            id: u.id,
+            email: u.email || current.email,
+            nome: meta.nome || meta.full_name || u.email?.split('@')[0] || 'Cidadão Kurió',
+            avatarUrl: meta.avatar_url || meta.picture || current.avatarUrl,
+            telefone: meta.telefone || current.telefone || '',
+            endereco: meta.endereco || current.endereco || '',
+            chavePixPessoal: meta.chavePixPessoal || current.chavePixPessoal || '',
+            role: current.role || 'CIDADAO',
+          }
+          saveUserSession(syncUser)
+          setUser(syncUser)
+        }
+      })
+
+      return () => subscription.unsubscribe()
+    })
+  }, [])
+
   useEffect(() => {
     carregarPontos()
     const interval = setInterval(carregarPontos, 30000)
@@ -183,7 +234,9 @@ export default function HomePage() {
 
           {/* Logoff Button */}
           <button
-            onClick={() => {
+            onClick={async () => {
+              const { supabase } = await import('@/lib/supabase')
+              await supabase.auth.signOut()
               const u = logoutUser()
               setUser(u)
             }}

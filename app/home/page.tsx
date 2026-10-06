@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Inter } from 'next/font/google'
 import { User, getRoleBadge } from '@/lib/types'
-import { getCurrentUser, logoutUser } from '@/lib/auth'
+import { getCurrentUser, logoutUser, saveUserSession } from '@/lib/auth'
 import ModalAuthOnboarding from '@/components/ModalAuthOnboarding'
 import ModalEnviarPrefeitura from '@/components/ModalEnviarPrefeitura'
 import KurioLogo from '@/components/KurioLogo'
@@ -43,6 +43,54 @@ export default function LandingPage() {
   const [activeId, setActiveId]         = useState('')
 
   const badge = getRoleBadge(user.role)
+
+  useEffect(() => {
+    import('@/lib/supabase').then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const u = session.user
+          const meta = u.user_metadata || {}
+          const current = getCurrentUser()
+          const syncUser: User = {
+            ...current,
+            id: u.id,
+            email: u.email || current.email,
+            nome: meta.nome || meta.full_name || u.email?.split('@')[0] || 'Cidadão Kurió',
+            avatarUrl: meta.avatar_url || meta.picture || current.avatarUrl,
+            telefone: meta.telefone || current.telefone || '',
+            endereco: meta.endereco || current.endereco || '',
+            chavePixPessoal: meta.chavePixPessoal || current.chavePixPessoal || '',
+            role: current.role || 'CIDADAO',
+          }
+          saveUserSession(syncUser)
+          setUser(syncUser)
+        }
+      })
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const u = session.user
+          const meta = u.user_metadata || {}
+          const current = getCurrentUser()
+          const syncUser: User = {
+            ...current,
+            id: u.id,
+            email: u.email || current.email,
+            nome: meta.nome || meta.full_name || u.email?.split('@')[0] || 'Cidadão Kurió',
+            avatarUrl: meta.avatar_url || meta.picture || current.avatarUrl,
+            telefone: meta.telefone || current.telefone || '',
+            endereco: meta.endereco || current.endereco || '',
+            chavePixPessoal: meta.chavePixPessoal || current.chavePixPessoal || '',
+            role: current.role || 'CIDADAO',
+          }
+          saveUserSession(syncUser)
+          setUser(syncUser)
+        }
+      })
+
+      return () => subscription.unsubscribe()
+    })
+  }, [])
 
   useEffect(() => {
     const ids = ['proposta-prefeitura', 'como-funciona', 'perfis', 'mobilizacao-cidada']
@@ -107,7 +155,9 @@ export default function LandingPage() {
             </button>
 
             <button
-              onClick={() => {
+              onClick={async () => {
+                const { supabase } = await import('@/lib/supabase')
+                await supabase.auth.signOut()
                 const u = logoutUser()
                 setUser(u)
               }}

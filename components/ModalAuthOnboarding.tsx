@@ -72,7 +72,8 @@ export default function ModalAuthOnboarding({ onClose, onSuccess }: ModalAuthOnb
   // Modo do painel de acesso: login (já tem conta) ou cadastro (novo)
   const [authModo, setAuthModo] = useState<'login' | 'cadastro'>('cadastro')
 
-  const handleLogoff = () => {
+  const handleLogoff = async () => {
+    await supabase.auth.signOut()
     const guestUser = logoutUser()
     setCurrentUser(guestUser)
     setSucessoMensagem('👋 Logoff realizado com sucesso. Você está como Visitante.')
